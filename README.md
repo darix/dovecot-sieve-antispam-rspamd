@@ -1,0 +1,2 @@
+# dovecot-sieve-antispam-rspamd
+
