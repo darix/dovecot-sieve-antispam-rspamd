@@ -1,4 +1,4 @@
-# Dovecot Antispwm with Sieve (and rspamd)
+# Dovecot Antispam with Sieve (and rspamd)
 
 Scripts and config to implement spam/ham learning via imap_sieve
 
