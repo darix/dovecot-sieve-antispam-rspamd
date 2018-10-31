@@ -25,6 +25,14 @@ https://wiki2.dovecot.org/Pigeonhole/Sieve/Extensions/SpamtestVirustest
    we learn them as ham. Anything that wasn't detected as 100% spam yet will be trained
    as spam if we move mails in. so this supports the first point
 
+## Default paths used
+
+dovecot config dir: /etc/dovecot
+
+all sieve files and scripts: /usr/lib/dovecot/sieve/
+
+config assumes all mailboxes are child of INBOX so INBOX/Spam for the spam folder.
+
 ## How to install
 
 1. make install
