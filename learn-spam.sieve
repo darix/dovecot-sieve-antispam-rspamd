@@ -4,4 +4,4 @@ if environment :matches "imap.user" "*" {
   set "username" "${1}";
 }
 
-pipe :copy "learn-spam.script" [ "${username}" ];
+pipe :copy "learn-spam.rspamd.script" [ "${username}" ];
