@@ -1,8 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 RSPAMD_CONTROLLER_PASSWORD_FILE="/etc/dovecot/rspamd-controller-password"
 source $RSPAMD_CONTROLLER_PASSWORD_FILE
 if [ -z "$RSPAMD_CONTROLLER_PASSWORD" ] ; then
-  logger "Missing password for rspamd in '$RSPAMD_CONTROLLER_PASSWORD_FILE'"
+  logger "Missing password for rspamd controller in '$RSPAMD_CONTROLLER_PASSWORD_FILE'"
   exit 1
 fi
-exec /usr/bin/rspamc -h /run/rspamd/worker-controller.socket -P $RSPAMD_CONTROLLER_PASSWORD learn_ham
+
+if [ -z "$RSPAMD_CONTROLLER_HOST" ] ; then
+  logger "Using socket connection to rspamd"
+  exec /usr/bin/rspamc -h $RSPAMD_CONTROLLER_SOCKET -P $RSPAMD_CONTROLLER_PASSWORD learn_ham
+else
+  logger "Using HTTP connection to rspamd"
+  exec /usr/bin/curl --silent -H "password: $RSPAMD_CONTROLLER_PASSWORD" -H "Deliver-To: $1" -H "Category: bayes_user" --data-binary @- $RSPAMD_CONTROLLER_HOST/learnham
+fi
