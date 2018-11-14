@@ -5,4 +5,4 @@ if environment :matches "imap.user" "*" {
 }
 
 addflag "\\Seen";
-pipe :copy "learn-spam.script" [ "${username}" ];
+pipe :copy "learn-spam.rspamd.script" [ "${username}" ];
