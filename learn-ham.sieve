@@ -8,8 +8,4 @@ if string :matches "${mailbox}" ["*/Trash", "Trash"] {
   stop;
 }
 
-if environment :matches "imap.user" "*" {
-  set "username" "${1}";
-}
-
-pipe :copy "learn-ham.rspamd.script" [ "${username}" ];
+pipe :copy "learn-ham.rspamd.script";

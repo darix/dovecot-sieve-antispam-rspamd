@@ -74,10 +74,6 @@ Scripts and config to implement spam/ham learning via imap_sieve.
    > recipients over MIME ones and prioritize the special LDA header
    > called Delivered-To that can be appended by -d options for rspamc)
 
-   Also note that users could write their own `learn-*.script` sieve
-   scripts that pass other usernames than their own and train statistics
-   for other users that way.
-
 4. Instead of creating `INBOX/Spam` and sorting mail for all users, you
    can let your users opt-in: when you use `global-try-spam.sieve` as
    `sieve_before` script, it will only sort mails for a user if
@@ -140,6 +136,17 @@ option starts with `.` or `/` it is interpreted as filename, and the
 password is read from the file.
 
 [`rspamc_password_callback`]: https://github.com/rspamd/rspamd/blob/f9d5c7051dba5f9acd97f160ea07981a264d64bf/src/client/rspamc.c#L340
+
+## imap.user / $USER
+
+To prevent users training other users' statistics, the learning script
+use [`$USER`] to determine the imap user.  This should be same as
+[`imap.user`] from the sieve environment.
+
+This is sadly not documented.
+
+[`imap.user`]: https://github.com/dovecot/pigeonhole/blob/43f5835b3830830cb84a04a5a06c7e6b15cc21df/src/plugins/imapsieve/ext-imapsieve-environment.c#L28
+[`$USER`]: https://github.com/dovecot/pigeonhole/blob/43f5835b3830830cb84a04a5a06c7e6b15cc21df/src/plugins/sieve-extprograms/sieve-extprograms-common.c#L547
 
 # Related bugs
 

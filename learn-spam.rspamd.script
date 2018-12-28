@@ -11,8 +11,8 @@ ham|spam) ;;
 	;;
 esac
 
-# first argument is the "imap.user" (from sieve environment)
-deliver_to=$1
+# get "imap.user" (from sieve environment), also available as $USER
+deliver_to=$USER
 
 # defaults
 RSPAMD_CONTROLLER_PASSWORD=/etc/dovecot/rspamd-controller.password
