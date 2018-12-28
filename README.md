@@ -77,6 +77,11 @@ Scripts and config to implement spam/ham learning via imap_sieve.
    scripts that pass other usernames than their own and train statistics
    for other users that way.
 
+4. Instead of creating `INBOX/Spam` and sorting mail for all users, you
+   can let your users opt-in: when you use `global-try-spam.sieve` as
+   `sieve_before` script, it will only sort mails for a user if
+   `INBOX/Spam` already exists.
+
 # Further reading
 
 - https://wiki.dovecot.org/HowTo/AntispamWithSieve
