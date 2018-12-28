@@ -25,8 +25,10 @@ Scripts and config to implement spam/ham learning via imap_sieve.
 
 - dovecot config dir: `/etc/dovecot`
 - all sieve files and scripts: `/usr/lib/dovecot/sieve/`
-- config assumes all mailboxes are child of `INBOX`; so `INBOX/Spam` for
-  the spam folder, and `INBOX/Trash` for the trash folder.
+- config assumes all mailboxes are child of `INBOX`; so `INBOX/Spam` is
+  used for the spam folder.  All mailboxes named `Trash` or end in
+  `/Trash` (including `INBOX/Trash`) are considered trash, i.e. moving
+  mails from Spam to trash doesn't learn them as ham.
 
 ## How to install
 
