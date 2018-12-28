@@ -10,7 +10,7 @@ install-files:
 	install -D -m 0644 global-spam.sieve            $(DESTDIR)$(sieve_pipe_bin_dir)/global-spam.sieve
 	install -D -m 0755 learn-ham.rspamd.script      $(DESTDIR)$(sieve_pipe_bin_dir)/learn-ham.rspamd.script
 	install -D -m 0755 learn-spam.rspamd.script     $(DESTDIR)$(sieve_pipe_bin_dir)/learn-spam.rspamd.script
-	install -D -m 0644 rspamd-controller-password   $(DESTDIR)$(dovecot_config_dir)/rspamd-controller-password
+	install -D -m 0644 rspamd-controller.conf.sh    $(DESTDIR)$(dovecot_config_dir)/rspamd-controller.conf.sh
 
 compile-sieve:
 	doveadm reload
