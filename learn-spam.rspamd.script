@@ -1,15 +1,86 @@
 #!/bin/bash
-RSPAMD_CONTROLLER_PASSWORD_FILE="/etc/dovecot/rspamd-controller-password"
-source $RSPAMD_CONTROLLER_PASSWORD_FILE
-if [ -z "$RSPAMD_CONTROLLER_PASSWORD" ] ; then
-  logger "Missing password for rspamd controller in '$RSPAMD_CONTROLLER_PASSWORD_FILE'"
-  exit 1
+
+action=$(basename "$0" .rspamd.script)
+action=${action#learn-}
+
+case "${action}" in
+ham|spam) ;;
+*)
+	logger -p mail.err "Can't figure out action (ham/spam) from script name '$0'"
+	exit 1
+	;;
+esac
+
+# get "imap.user" (from sieve environment), also available as $USER
+deliver_to=$USER
+
+# defaults
+RSPAMD_CONTROLLER_PASSWORD=/etc/dovecot/rspamd-controller.password
+RSPAMD_CONTROLLER_SOCKET=
+RSPAMD_CONTROLLER_HOST=
+RSPAMD_CLASSIFIER=
+
+if [ -r "/etc/dovecot/rspamd-controller.conf.sh" ]; then
+	source "/etc/dovecot/rspamd-controller.conf.sh"
 fi
 
-if [ -z "$RSPAMD_CONTROLLER_HOST" ] ; then
-  logger "Using socket connection to rspamd"
-  exec /usr/bin/rspamc -h $RSPAMD_CONTROLLER_SOCKET -P $RSPAMD_CONTROLLER_PASSWORD learn_spam
+# RSPAMD_CONTROLLER_PASSWORD is supposed to be a filename, pointing to
+# a file including the password.
+# If it contains a password directly, store it in ${password} instead.
+password=
+if [ "${RSPAMD_CONTROLLER_PASSWORD:0:1}" != '.' -a "${RSPAMD_CONTROLLER_PASSWORD:0:1}" != '/' ]; then
+	logger -p mail.debug "Plaintext password given (should use a password file instead)"
+
+	password=${RSPAMD_CONTROLLER_PASSWORD}
+	RSPAMD_CONTROLLER_PASSWORD=
+elif [ ! -r "${RSPAMD_CONTROLLER_PASSWORD}" ]; then
+	logger -p mail.err "Missing password file for rspamc"
+	exit 1
+fi
+
+if [ -z "${RSPAMD_CONTROLLER_HOST}" ] ; then
+	logger -p mail.debug "Using socket connection to rspamd"
+
+	args=()
+	if [ -n "${RSPAMD_CONTROLLER_SOCKET}" ]; then
+		args+=(-h "${RSPAMD_CONTROLLER_SOCKET}")
+	fi
+	if [ -n "${RSPAMD_CONTROLLER_PASSWORD}" ]; then
+		args+=(-P "${RSPAMD_CONTROLLER_PASSWORD}")
+	fi
+	if [ -n "${RSPAMD_CLASSIFIER}" ]; then
+		args+=(-c "${RSPAMD_CLASSIFIER}")
+	fi
+
+	if [ -n "${password}" ]; then
+		# pass password through pipe; printf is a builtin and won't be
+		# visible in ps; the generated path should look like /dev/fd/...
+		# and always start with a '/'
+		exec /usr/bin/rspamc -P <(printf "%s\n" "${password}") "${args[@]}" -d "${deliver_to}" "learn_${action}"
+	else
+		exec /usr/bin/rspamc "${args[@]}" -d "${deliver_to}" "learn_${action}"
+	fi
 else
-  logger "Using HTTP connection to rspamd"
-  exec /usr/bin/curl --silent -H "password: $RSPAMD_CONTROLLER_PASSWORD" -H "Deliver-To: $1" -H "Category: bayes_user" --data-binary @- $RSPAMD_CONTROLLER_HOST/learnspam
+	logger -p mail.debug "Using HTTP connection to rspamd"
+
+	headers=(
+		-H "Deliver-To: ${deliver_to}"
+	)
+	if [ -n "${RSPAMD_CONTROLLER_PASSWORD}" ]; then
+		# curl supports files for headers, but needs the full header
+		# generating it on the fly below, but read password here.
+		read password < "${RSPAMD_CONTROLLER_PASSWORD}"
+	fi
+	if [ -n "${RSPAMD_CLASSIFIER}" ]; then
+		headers+=(-H "Category: ${RSPAMD_CLASSIFIER}")
+	fi
+
+	# pass password header through pipe; printf is a builtin and won't
+	# be visible in ps
+	exec /usr/bin/curl \
+		--silent \
+		-H @<(printf "password: %s\r\n" "${password}") \
+		"${headers[@]}" \
+		--data-binary @- \
+		"${RSPAMD_CONTROLLER_HOST}/learn${action}"
 fi
