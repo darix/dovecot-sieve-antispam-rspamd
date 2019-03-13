@@ -8,4 +8,4 @@ if string :matches "${mailbox}" ["*/Trash", "Trash"] {
   stop;
 }
 
-socket :copy "rspamd-learn-ham";
+pipe :copy "rspamd-learn-ham";
