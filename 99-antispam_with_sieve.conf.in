@@ -7,13 +7,13 @@ plugin {
   sieve_extensions = +editheader +mboxmetadata +servermetadata +imapflags +notify +spamtest +spamtestplus +virustest
 
   # From elsewhere to Spam folder
-  imapsieve_mailbox1_name = INBOX/Spam
+  imapsieve_mailbox1_name = @JUNK_FOLDER@
   imapsieve_mailbox1_causes = COPY
   imapsieve_mailbox1_before = file:/usr/lib/dovecot/sieve/learn-spam.sieve
 
   # From Spam folder to elsewhere
   imapsieve_mailbox2_name = *
-  imapsieve_mailbox2_from = INBOX/Spam
+  imapsieve_mailbox2_from = @JUNK_FOLDER@
   imapsieve_mailbox2_causes = COPY
   imapsieve_mailbox2_before = file:/usr/lib/dovecot/sieve/learn-ham.sieve
 
@@ -55,5 +55,5 @@ plugin {
   #
   # Automatically filter spam into the spam folder
   #
-  sieve_before = /usr/lib/dovecot/sieve/global-spam.sieve
+  sieve_before = /usr/lib/dovecot/sieve/@GLOBAL_SIEVE_SCRIPT@
 }

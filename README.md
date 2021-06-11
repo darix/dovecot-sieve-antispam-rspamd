@@ -26,8 +26,8 @@ Scripts and config to implement spam/ham learning via imap_sieve.
 - dovecot config dir: `/etc/dovecot`
 - all sieve files: `/usr/lib/dovecot/sieve/`
 - all sieve pipe scripts: `/usr/lib/dovecot/sieve-pipe/`
-- config assumes all mailboxes are child of `INBOX`; so `INBOX/Spam` is
-  used for the spam folder.  All mailboxes named `Trash` or end in
+- default config assumes all mailboxes are child of `INBOX`; so `INBOX/Spam`
+  is used for the spam folder.  All mailboxes named `Trash` or end in
   `/Trash` (including `INBOX/Trash`) are considered trash, i.e. moving
   mails from Spam to trash doesn't learn them as ham.
 
@@ -39,6 +39,16 @@ Scripts and config to implement spam/ham learning via imap_sieve.
    install the files (make install-files) as compiling those sieve files
    requires the dovecot config being reloaded so all the settings are
    active.
+
+   The makefile uses the following variables that you can overwrite
+
+   JUNK_FOLDER=INBOX/Spam
+   # other option global-try-spam.sieve
+   GLOBAL_SIEVE_SCRIPT=global-spam.sieve
+
+   dovecot_config_dir=/etc/dovecot
+   sieve_dir=/usr/lib/dovecot/sieve
+   sieve_pipe_dir=/usr/lib/dovecot/sieve-pipe
 
 2. set password in `/etc/dovecot/rspamd-controller.password`
 

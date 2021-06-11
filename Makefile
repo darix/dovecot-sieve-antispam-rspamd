@@ -1,10 +1,18 @@
+JUNK_FOLDER=INBOX/Spam
+GLOBAL_SIEVE_SCRIPT=global-spam.sieve
+
 dovecot_config_dir=/etc/dovecot
 sieve_dir=/usr/lib/dovecot/sieve
 sieve_pipe_dir=/usr/lib/dovecot/sieve-pipe
 
 install: install-files compile-sieve
 
-install-files:
+build:
+	sed -e 's|@JUNK_FOLDER@|$(JUNK_FOLDER)|g; s|@GLOBAL_SIEVE_SCRIPT@|$(GLOBAL_SIEVE_SCRIPT)|g' < 99-antispam_with_sieve.conf.in > 99-antispam_with_sieve.conf
+	sed -e 's|@JUNK_FOLDER@|$(JUNK_FOLDER)|g; s|@GLOBAL_SIEVE_SCRIPT@|$(GLOBAL_SIEVE_SCRIPT)|g' < global-spam.sieve.in > global-spam.sieve
+	sed -e 's|@JUNK_FOLDER@|$(JUNK_FOLDER)|g; s|@GLOBAL_SIEVE_SCRIPT@|$(GLOBAL_SIEVE_SCRIPT)|g' < global-try-spam.sieve.in > global-try-spam.sieve
+
+install-files: build
 	install -D -m 0644 99-antispam_with_sieve.conf  $(DESTDIR)$(dovecot_config_dir)/conf.d/99-antispam_with_sieve.conf
 	install -D -m 0644 learn-ham.sieve              $(DESTDIR)$(sieve_dir)/learn-ham.sieve
 	install -D -m 0644 learn-spam.sieve             $(DESTDIR)$(sieve_dir)/learn-spam.sieve

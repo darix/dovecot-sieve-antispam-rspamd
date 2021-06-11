@@ -1,9 +1,9 @@
 require ["fileinto", "mailbox", "spamtest", "relational", "comparator-i;ascii-numeric"];
 
-# don't create INBOX/Spam; only sort mail if it already exists
-if mailboxexists "INBOX/Spam" {
+# don't create @JUNK_FOLDER@; only sort mail if it already exists
+if mailboxexists "@JUNK_FOLDER@" {
   if spamtest :value "ge" :comparator "i;ascii-numeric" "10" {
-    fileinto :create "INBOX/Spam";
+    fileinto :create "@JUNK_FOLDER@";
     stop;
   }
 }
